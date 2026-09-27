@@ -1,0 +1,20 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# Trained models (generate locally with train.py)
+*.pkl
+
+# Environment / secrets
+.env
+
+# OS files
+.DS_Store
+
+# Note: data/data.csv is intentionally NOT ignored, since a small
+# sample dataset is included with this repository. If your own
+# collected dataset grows large or contains data you don't want to
+# publish, uncomment the line below.
+# data/data.csv

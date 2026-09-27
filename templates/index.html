@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plastic AI System — Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0e1416;
+    --panel: #161f22;
+    --panel-border: #263238;
+    --accent: #2dd4bf;
+    --accent-dim: #14524a;
+    --text: #e6f1ef;
+    --text-dim: #8aa19d;
+    --red: #ff5c5c;
+    --green: #4ade80;
+    --blue: #60a5fa;
+    --warn: #f5b942;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Segoe UI", Roboto, Arial, sans-serif;
+    background: radial-gradient(circle at top, #101a1c 0%, #0a0f11 100%);
+    color: var(--text);
+    padding: 24px;
+  }
+  header {
+    text-align: center;
+    margin-bottom: 28px;
+  }
+  header h1 {
+    margin: 0;
+    font-size: 1.6rem;
+    letter-spacing: 2px;
+    color: var(--accent);
+    text-transform: uppercase;
+  }
+  header p {
+    color: var(--text-dim);
+    margin-top: 6px;
+    font-size: 0.85rem;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    max-width: 1100px;
+    margin: 0 auto 20px;
+  }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    border-radius: 10px;
+    padding: 18px;
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--accent);
+    opacity: 0.7;
+  }
+  .card h2 {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-dim);
+    margin: 0 0 10px;
+  }
+  .value {
+    font-size: 2rem;
+    font-weight: 700;
+  }
+  .value.red { color: var(--red); }
+  .value.green { color: var(--green); }
+  .value.blue { color: var(--blue); }
+
+  .material-card .value {
+    font-size: 1.8rem;
+    color: var(--accent);
+  }
+  .status-pill {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .status-known { background: var(--accent-dim); color: var(--accent); }
+  .status-unknown { background: #4a2e14; color: var(--warn); }
+
+  .swatch {
+    width: 100%;
+    height: 46px;
+    border-radius: 8px;
+    margin-top: 10px;
+    border: 1px solid var(--panel-border);
+  }
+
+  .panel-wide {
+    max-width: 1100px;
+    margin: 0 auto 20px;
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    border-radius: 10px;
+    padding: 18px 20px;
+  }
+  .panel-wide h2 {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-dim);
+    margin: 0 0 12px;
+  }
+
+  .controls {
+    max-width: 1100px;
+    margin: 0 auto 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+  }
+  select, button, input[type=text] {
+    background: var(--panel);
+    color: var(--text);
+    border: 1px solid var(--panel-border);
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 0.85rem;
+  }
+  button {
+    cursor: pointer;
+    border-color: var(--accent-dim);
+    transition: background 0.15s ease;
+  }
+  button:hover { background: var(--accent-dim); }
+  button.primary { background: var(--accent); color: #06201d; font-weight: 700; border: none; }
+  button.primary:hover { filter: brightness(1.08); }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+  th, td {
+    text-align: left;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--panel-border);
+  }
+  th { color: var(--text-dim); text-transform: uppercase; font-size: 0.7rem; letter-spacing: 1px; }
+
+  #log {
+    max-width: 1100px;
+    margin: 0 auto;
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    text-align: center;
+    min-height: 20px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Plastic AI Identification System</h1>
+  <p>RGB-based plastic classification — Raspberry Pi Zero 2W prototype</p>
+</header>
+
+<div class="grid">
+  <div class="card">
+    <h2>Red</h2>
+    <div class="value red" id="valR">--</div>
+  </div>
+  <div class="card">
+    <h2>Green</h2>
+    <div class="value green" id="valG">--</div>
+  </div>
+  <div class="card">
+    <h2>Blue</h2>
+    <div class="value blue" id="valB">--</div>
+  </div>
+  <div class="card material-card">
+    <h2>Detected Material</h2>
+    <div class="value" id="material">--</div>
+    <span class="status-pill status-unknown" id="statusPill">Waiting...</span>
+    <div class="swatch" id="swatch"></div>
+  </div>
+</div>
+
+<div class="panel-wide">
+  <h2>Live RGB Graph</h2>
+  <canvas id="rgbChart" height="90"></canvas>
+</div>
+
+<div class="controls">
+  <input type="text" id="labelInput" placeholder="Material label (e.g. PET)">
+  <button class="primary" onclick="saveSample()">Save Sample</button>
+  <button onclick="trainModel()">Train Model</button>
+  <button onclick="loadTable()">Refresh Data Table</button>
+</div>
+
+<div id="log"></div>
+
+<div class="panel-wide">
+  <h2>Collected Dataset</h2>
+  <div style="max-height: 320px; overflow-y: auto;">
+    <table id="dataTable">
+      <thead>
+        <tr><th>R</th><th>G</th><th>B</th><th>Material</th><th>Timestamp</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+const MAX_POINTS = 40;
+const ctx = document.getElementById('rgbChart').getContext('2d');
+const chart = new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels: [],
+    datasets: [
+      { label: 'R', data: [], borderColor: '#ff5c5c', tension: 0.3, pointRadius: 0 },
+      { label: 'G', data: [], borderColor: '#4ade80', tension: 0.3, pointRadius: 0 },
+      { label: 'B', data: [], borderColor: '#60a5fa', tension: 0.3, pointRadius: 0 },
+    ]
+  },
+  options: {
+    responsive: true,
+    animation: false,
+    scales: {
+      x: { display: false },
+      y: { min: 0, max: 255, grid: { color: '#263238' }, ticks: { color: '#8aa19d' } }
+    },
+    plugins: { legend: { labels: { color: '#e6f1ef' } } }
+  }
+});
+
+let lastReading = { R: 0, G: 0, B: 0 };
+
+function setLog(msg) {
+  document.getElementById('log').textContent = msg;
+  setTimeout(() => { document.getElementById('log').textContent = ''; }, 3000);
+}
+
+async function refreshData() {
+  try {
+    const res = await fetch('/data');
+    const d = await res.json();
+    lastReading = { R: d.R, G: d.G, B: d.B };
+
+    document.getElementById('valR').textContent = d.R;
+    document.getElementById('valG').textContent = d.G;
+    document.getElementById('valB').textContent = d.B;
+    document.getElementById('material').textContent = d.material;
+    document.getElementById('swatch').style.background = `rgb(${d.R},${d.G},${d.B})`;
+
+    const pill = document.getElementById('statusPill');
+    if (!d.model_trained) {
+      pill.textContent = 'Model Not Trained';
+      pill.className = 'status-pill status-unknown';
+    } else if (d.known) {
+      pill.textContent = 'Known Sample';
+      pill.className = 'status-pill status-known';
+    } else {
+      pill.textContent = 'Unknown / Alert';
+      pill.className = 'status-pill status-unknown';
+    }
+
+    const t = new Date().toLocaleTimeString();
+    chart.data.labels.push(t);
+    chart.data.datasets[0].data.push(d.R);
+    chart.data.datasets[1].data.push(d.G);
+    chart.data.datasets[2].data.push(d.B);
+
+    if (chart.data.labels.length > MAX_POINTS) {
+      chart.data.labels.shift();
+      chart.data.datasets.forEach(ds => ds.data.shift());
+    }
+    chart.update();
+  } catch (err) {
+    setLog('Could not reach /data endpoint.');
+  }
+}
+
+async function saveSample() {
+  const label = document.getElementById('labelInput').value.trim() || 'Unlabeled';
+  const res = await fetch('/save', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ...lastReading, material: label })
+  });
+  const d = await res.json();
+  setLog(`Saved: R=${d.R} G=${d.G} B=${d.B} -> ${d.Material}`);
+  loadTable();
+}
+
+async function trainModel() {
+  setLog('Training model...');
+  const res = await fetch('/train', { method: 'POST' });
+  const d = await res.json();
+  if (d.status === 'trained') {
+    setLog(`Model trained on ${d.samples_used} samples (${d.classes.join(', ')}).`);
+  } else {
+    setLog(`Training failed: ${d.message}`);
+  }
+}
+
+async function loadTable() {
+  const res = await fetch('/table');
+  const rows = await res.json();
+  const tbody = document.querySelector('#dataTable tbody');
+  tbody.innerHTML = '';
+  rows.slice(-100).reverse().forEach(r => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${r.R}</td><td>${r.G}</td><td>${r.B}</td><td>${r.Material}</td><td>${r.timestamp || ''}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+setInterval(refreshData, 1500);
+refreshData();
+loadTable();
+</script>
+
+</body>
+</html>

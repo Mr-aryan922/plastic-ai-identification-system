@@ -1,0 +1,15 @@
+[Unit]
+Description=AI-Based Plastic Identification System (Flask App)
+After=network.target
+
+[Service]
+# Update these paths/user to match your actual installation.
+User=pi
+WorkingDirectory=/home/pi/plastic-ai-identification-system
+ExecStart=/home/pi/plastic-ai-identification-system/venv/bin/python app.py
+Restart=on-failure
+RestartSec=5
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target
