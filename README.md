@@ -4,7 +4,7 @@ Smart RGB-based plastic detection using a Raspberry Pi Zero 2W, a color
 sensor, and a machine-learning classifier, with a real-time web
 dashboard.
 
-**Developer:** Aryan Kamble ("Dark") · [@dark18ghost18](https://github.com/dark18ghost18)
+**Developer:** Aryan Kamble · [@Mr-aryan922](https://github.com/Mr-aryan922)
 
 ---
 
@@ -125,9 +125,9 @@ plastic-ai-identification-system/
 ## Installation
 
 ```bash
-git clone https://github.com/dark18ghost18/plastic-ai-identification-system.git
-cd plastic-ai-identification-system
+git clone [https://github.com/Mr-aryan922/plastic-ai-identification-system.git](https://github.com/Mr-aryan922/plastic-ai-identification-system.git)
 
+cd plastic-ai-identification-system
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
@@ -240,6 +240,7 @@ MIT — see [`LICENSE`](LICENSE).
 ## Author
 
 **Aryan Kamble**
-Interests: Robotics, Automation, AI, Embedded Systems, IoT, Machine
-Learning, Computer Vision.
-GitHub: [@dark18ghost18](https://github.com/dark18ghost18)
+
+Interests: Robotics, Automation, AI, Embedded Systems, IoT, Machine Learning, Computer Vision.
+
+GitHub: [@Mr-aryan922](https://github.com/Mr-aryan922)
